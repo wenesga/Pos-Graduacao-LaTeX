@@ -1,0 +1,1150 @@
+\documentclass[aspectratio=169,10pt,xcolor=table]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage[sfdefault]{FiraSans}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{fontawesome5}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Evita quebrar palavras com hífen
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
+% ================= CORES =================
+\definecolor{azul}{HTML}{15324E}
+\definecolor{azulclaro}{HTML}{E8EEF4}
+\definecolor{solar}{HTML}{F2A007}
+\definecolor{laranja}{HTML}{D2601A}
+\definecolor{cinza}{HTML}{6B7680}
+\definecolor{cinzaclaro}{HTML}{EEF0F2}
+\definecolor{fundo}{HTML}{F7F5F0}
+\definecolor{verde}{HTML}{2E7D4F}
+\definecolor{vermelho}{HTML}{B3261E}
+
+% ================= TEMA =================
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=azul}
+\setbeamercolor{structure}{fg=laranja}
+\setbeamercolor{alerted text}{fg=laranja}
+\setbeamerfont{alerted text}{series=\bfseries}
+
+\setbeamertemplate{itemize item}{\raisebox{0.15em}{\textcolor{solar}{\rule{0.42em}{0.42em}}}}
+\setbeamertemplate{itemize subitem}{\textcolor{laranja}{\guillemotright}}
+\setbeamertemplate{enumerate item}{%
+  \tikz[baseline=(n.base)]\node[circle,fill=solar,text=azul,inner sep=0pt,minimum size=1.35em,
+    font=\scriptsize\bfseries] (n) {\insertenumlabel};}
+\setbeamertemplate{itemize/enumerate body begin}{\raggedright\setlength{\itemsep}{0.3em}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{0.1em}}
+
+% Título do slide: nome da parte em cima e título embaixo
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em
+  {\tiny\bfseries\color{laranja}\MakeUppercase{\insertsectionhead}}\par
+  \vskip-0.1em
+  {\Large\bfseries\color{azul}\insertframetitle}\par
+  \vskip-0.15em
+  \textcolor{solar}{\rule{2em}{2pt}}
+  \vskip-0.2em}
+
+% Rodapé com barra de progresso
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[cinzaclaro] (current page.south west) rectangle ($(current page.south east)+(0,0.09)$);
+    \fill[solar] (current page.south west) rectangle
+      ($(current page.south west)+({\paperwidth*(\insertframenumber/\inserttotalframenumber)},0.09)$);
+  \end{tikzpicture}%
+  \leavevmode\hbox to\paperwidth{%
+    \hspace{1.6em}{\tiny\color{cinza}Instalação de Sistemas Fotovoltaicos \;\textbar\; Wenes Gomes Aquino}%
+    \hfill{\tiny\bfseries\color{cinza}\insertframenumber\,/\,\inserttotalframenumber}\hspace{1.6em}}%
+  \vskip0.55em}
+
+\setbeamersize{text margin left=1.6em,text margin right=1.6em}
+\linespread{1.08}
+
+% ================= CARTÕES =================
+% \begin{card}[opções]{cor}{título} ... \end{card}
+\newtcolorbox{card}[3][]{enhanced,
+  colback=#2!5!white, colframe=#2, coltitle=#2,
+  colbacktitle=#2!5!white,
+  boxrule=0pt, toprule=2.6pt, arc=3pt, outer arc=3pt,
+  left=7pt, right=7pt, top=3pt, bottom=6pt,
+  toptitle=5pt, bottomtitle=0pt, titlerule=0pt,
+  fonttitle=\bfseries\small, fontupper=\small, halign title=flush left,
+  title={#3}, before upper={\raggedright\setlength{\parskip}{0.2em}}, #1}
+
+% Destaque (frase de efeito)
+\newtcolorbox{destaque}{enhanced, colback=fundo, colframe=solar,
+  boxrule=0pt, leftrule=3.5pt, arc=0pt, outer arc=0pt,
+  left=10pt, right=10pt, top=3pt, bottom=3pt, before skip=4pt, after skip=0pt,
+  fontupper=\small\itshape, halign=center}
+\newcommand{\frase}[1]{\vspace{0.1em}\begin{destaque}#1\end{destaque}}
+
+% Ícone colorido em círculo
+\newcommand{\icone}[2]{\tikz[baseline=-0.6ex]\node[circle,fill=#1,text=white,
+  minimum size=1.7em,inner sep=0pt,font=\footnotesize]{#2};}
+
+% Tabelas com cabeçalho colorido e linhas alternadas
+\newcommand{\cabecalho}{\rowcolor{azul}}
+\newcommand{\tcab}[1]{\textcolor{white}{\bfseries #1}}
+
+% ================= TIKZ =================
+\tikzset{
+  seta/.style={-{Stealth[length=2.4mm,width=2mm]},line width=0.9pt,cinza},
+  pill/.style={rounded corners=3pt,font=\scriptsize\bfseries,align=center,
+    minimum height=2.5em,inner sep=2pt},
+}
+
+% Barra das etapas: concluídas em azul, atual em amarelo, futuras em contorno
+\newcommand{\barraetapas}[1]{%
+\begin{center}
+\begin{tikzpicture}
+  \foreach \t [count=\i] in {Projeto,Planeja-\\mento,Estrutura,Módulos,Elétrica,Inversor,Comissio-\\namento,Entrega}{
+    \ifnum\i<#1 \node[pill,fill=azul,text=white,text width=1.4cm] (n\i) at (\i*1.78,0) {\t};
+    \else\ifnum\i=#1 \node[pill,fill=solar,text=azul,text width=1.4cm] (n\i) at (\i*1.78,0) {\t};
+    \else \node[pill,draw=azul!40,line width=0.7pt,fill=white,text=azul!70,text width=1.4cm] (n\i) at (\i*1.78,0) {\t};
+    \fi\fi
+  }
+  \foreach \i [evaluate=\i as \j using int(\i+1)] in {1,...,7}{\draw[seta] (n\i.east) -- (n\j.west);}
+\end{tikzpicture}
+\end{center}}
+
+% Fluxo horizontal simples: \fluxo{largura}{A,B,C}
+\newcommand{\fluxo}[2]{%
+\begin{center}
+\begin{tikzpicture}
+  \foreach \t [count=\i] in {#2}{
+    \node[pill,fill=azul,text=white,text width=#1] (f\i) at (\i*#1+\i*0.55cm,0) {\t};
+    \xdef\ultimo{\i}
+  }
+  \foreach \i in {2,...,\ultimo}{\pgfmathtruncatemacro\a{\i-1}\draw[seta] (f\a.east) -- (f\i.west);}
+\end{tikzpicture}
+\end{center}}
+
+% Abertura de cada parte
+\newcommand{\abertura}[3]{%
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[azul] (current page.south west) rectangle (current page.north east);
+    \node[anchor=east,text=white!8!azul,font=\fontsize{150}{150}\selectfont\bfseries]
+      at ($(current page.east)+(-0.6,-0.2)$) {0#1};
+    \fill[solar] ($(current page.west)+(1.2,0.95)$) rectangle ++(1.2,0.09);
+    \node[anchor=west,text=solar,font=\normalsize\bfseries] at ($(current page.west)+(1.15,1.45)$) {PARTE #1};
+    \node[anchor=north west,text=white,font=\fontsize{30}{34}\selectfont\bfseries,text width=10cm,align=left]
+      (tt) at ($(current page.west)+(1.15,0.7)$) {#2};
+    \node[anchor=north west,text=white!75!azul,font=\normalsize,text width=9cm,align=left]
+      at ($(tt.south west)+(0,-0.2)$) {#3};
+  \end{tikzpicture}
+\end{frame}}
+
+\title{Instalação de Sistemas Fotovoltaicos}
+\author{Wenes Gomes Aquino}
+\date{2026}
+
+\begin{document}
+
+% ================= CAPA =================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[azul] (current page.south west) rectangle (current page.north east);
+    % sol
+    \begin{scope}[shift={($(current page.north east)+(-2.5,-2.2)$)}]
+      \fill[solar] (0,0) circle (0.85);
+      \foreach \a in {0,30,...,330}{\draw[solar,line width=2.4pt,line cap=round] (\a:1.12) -- (\a:1.45);}
+    \end{scope}
+    % arranjo de módulos
+    \begin{scope}[shift={($(current page.south east)+(-6.4,0.9)$)},yslant=0.28]
+      \foreach \x in {0,1.4,2.8,4.2}{\foreach \y in {0,1.0}{
+        \fill[white!14!azul] (\x,\y) rectangle ++(1.3,0.9);
+        \draw[solar!55,line width=0.35pt,step=0.325] (\x,\y) grid ++(1.3,0.9);
+        \draw[white!45!azul,line width=0.8pt] (\x,\y) rectangle ++(1.3,0.9);}}
+    \end{scope}
+    \fill[solar] ($(current page.west)+(1.2,2.05)$) rectangle ++(1.2,0.09);
+    \node[anchor=south west,text=solar,font=\normalsize\bfseries] at ($(current page.west)+(1.15,2.25)$) {RESUMO DOS CONTEÚDOS};
+    \node[anchor=north west,text=white,font=\fontsize{30}{35}\selectfont\bfseries,text width=12cm,align=left]
+      at ($(current page.west)+(1.15,1.85)$) {Instalação de\\Sistemas Fotovoltaicos};
+    \node[anchor=north west,text=white!80!azul,font=\small,text width=10cm,align=left]
+      at ($(current page.west)+(1.15,-1.0)$)
+      {\textbf{\textcolor{white}{Wenes Gomes Aquino}}\\[0.25em]
+       Prof. Brunno Henrique Brito, D. Eng.\\
+       Pós-graduação \textbar\ IFTO \textbar\ 2026};
+  \end{tikzpicture}
+\end{frame}
+
+% ================= ROTEIRO =================
+\section{Roteiro}
+\begin{frame}{Roteiro da apresentação}
+  \begin{columns}[c]
+    \begin{column}{0.44\textwidth}
+      \begin{enumerate}
+        \item Introdução e segurança
+        \item Estruturas de fixação
+        \item Instalação dos módulos
+        \item Instalação elétrica
+        \item Inversor e comissionamento
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{card}{azul}{\faLightbulb[regular]\enspace Ideia central da disciplina}
+        Instalar um sistema fotovoltaico não é só fixar módulos e conectar cabos.
+        É executar um sistema \textbf{elétrico e mecânico} feito para funcionar por \textbf{décadas}.
+      \end{card}
+    \end{column}
+  \end{columns}
+  \vspace{0.6em}
+  \barraetapas{9}
+\end{frame}
+
+% ================= PARTE 1 =================
+\section{Introdução e segurança}
+\abertura{1}{Introdução e segurança}{O que é uma instalação bem executada e quais riscos existem na obra.}
+
+\begin{frame}{O que é uma instalação bem executada?}
+  Uma boa instalação atende a \alert{cinco requisitos}:
+  \vspace{0.6em}
+  \begin{center}
+  \begin{tikzpicture}[req/.style={rounded corners=4pt,fill=fundo,text width=2.05cm,
+      minimum height=3.3cm,align=center,font=\footnotesize,inner sep=4pt,anchor=north}]
+    \foreach \ic/\t/\d [count=\i] in {
+      \faHardHat/Segurança/Não coloca pessoas em risco,
+      \faChartLine/Desempenho/Entrega a geração esperada,
+      \faShield*/Confiabilidade/Funciona por anos sem falhas,
+      \faClipboardCheck/Conformidade/Segue projeto{,} normas e distribuidora,
+      \faTools/Manutenção/Permite inspeção e troca de peças}{
+      \node[req] (r\i) at (\i*2.5,0) {\icone{azul}{\ic}\\[0.45em]{\bfseries\small\t}\\[0.3em]\d};
+      \node[circle,fill=solar,text=azul,font=\scriptsize\bfseries,inner sep=0pt,minimum size=1.3em]
+        at (r\i.north east) {\i};
+    }
+  \end{tikzpicture}
+  \end{center}
+  \frase{O sistema é elétrico e mecânico ao mesmo tempo, e precisa operar por décadas.}
+\end{frame}
+
+\begin{frame}{Do projeto à entrega da usina}
+  \barraetapas{1}
+  \vspace{0.2em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=pp]{azul}{\faDraftingCompass\enspace 1. Projeto: o que o instalador precisa ler}
+        \begin{itemize}
+          \item layout, número e potência dos módulos
+          \item strings, inversor e estrutura
+          \item cabos, proteções e aterramento
+          \item pontos de conexão
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=pp]{azul}{\faCalendarCheck[regular]\enspace 2. Planejamento: antes de ir para a obra}
+        \begin{itemize}
+          \item verificar o acesso e avaliar o telhado
+          \item conferir materiais e ferramentas
+          \item ver as condições do clima
+          \item definir a equipe e identificar riscos
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Logística, instalação e inspeção}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=lg]{azul}{\faTruck\enspace 3. Logística}
+        Como levar \textbf{30 módulos de 30\,kg} ao telhado sem danificar os módulos e sem arriscar a equipe?
+      \end{card}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=lg]{azul}{\faWrench\enspace 4. Instalação}
+        \begin{enumerate}\footnotesize
+          \item estrutura
+          \item módulos
+          \item cabeamento
+          \item inversor
+          \item proteções e aterramento
+        \end{enumerate}
+      \end{card}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=lg]{azul}{\faSearch\enspace 5. Inspeção}
+        Antes de energizar, conferir: conexões, polaridade, torque, cabos, proteções, aterramento, identificação e configuração.
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Os 4 grandes riscos da obra}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=r1]{vermelho}{\faUserInjured\enspace 1. Queda de altura}
+        Escadas, bordas, telhados frágeis ou molhados, circulação sobre telhas.
+      \end{card}
+      \begin{card}[equal height group=r2]{vermelho}{\faBolt\enspace 2. Choque elétrico}
+        \textbf{Lado CA:} rede, proteção e inversor.\\
+        \textbf{Lado CC:} módulos, strings, proteção e inversor.
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=r1]{vermelho}{\faFire\enspace 3. Arco elétrico}
+        Conexão CC mal feita causa aquecimento, carbonização e incêndio.
+      \end{card}
+      \begin{card}[equal height group=r2]{vermelho}{\faExclamationTriangle\enspace 4. Outros riscos}
+        Ferramentas, carga pesada, cortes, calor, chuva, vento, animais e insetos.
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Antes de instalar, pare e pergunte: o que pode dar errado nesta obra?}
+\end{frame}
+
+\begin{frame}{ABNT NBR 17193 (fevereiro de 2025)}
+  Segurança contra \alert{incêndio e choque elétrico} em sistemas FV em edificações.
+  Protege moradores, equipes de manutenção e bombeiros.
+  \vspace{0.5em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=n1]{azul}{\faPowerOff\enspace Desligamento rápido (RSD)}
+        Desenergizar os circuitos dos módulos em emergência, de forma manual ou automática.
+      \end{card}
+      \begin{card}[equal height group=n2]{azul}{\faTachometer*\enspace Limites de tensão}
+        Tensão reduzida a níveis seguros em até \textbf{30\,s} após o desligamento rápido.
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=n1]{azul}{\faFireExtinguisher\enspace Proteção contra arco (AFCI)}
+        Detectar e interromper arcos no lado CC para evitar princípio de incêndio.
+      \end{card}
+      \begin{card}[equal height group=n2]{azul}{\faRoute\enspace Acesso e rotas}
+        Disposição dos cabos, rotas de fuga e acesso livre para os bombeiros no telhado.
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Análise Preliminar de Riscos (APR)}
+  \begin{center}\small
+  \renewcommand{\arraystretch}{1.55}
+  \rowcolors{2}{fundo}{white}
+  \begin{tabular}{>{\bfseries}L{3.6cm} L{3cm} L{2.4cm} L{4cm}}
+    \cabecalho \tcab{Etapa} & \tcab{Perigo} & \tcab{Consequência} & \tcab{Medida preventiva}\\
+    Acesso ao telhado & Queda & Lesão grave & Proteção contra queda\\
+    Transporte do módulo & Queda de objeto & Ferimentos & Içamento adequado\\
+    Instalação dos módulos & Queda & Lesão & Sistema de proteção\\
+    Conexão CC & Choque ou arco & Queimadura & Procedimento adequado\\
+    Perfuração & Contato com fiação & Choque & Verificação prévia\\
+    Trabalho externo & Chuva ou vento & Acidente & Suspender a atividade\\
+  \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Regras de ouro do instalador}
+  \begin{enumerate}
+    \item Nunca comece uma instalação sem entender o projeto.
+    \item Nunca subestime o risco de queda.
+    \item Nunca considere o lado CC desligado só porque o inversor está desligado.
+    \item Nunca improvise materiais, conectores ou procedimentos.
+    \item Nunca energize sem fazer uma inspeção final.
+  \end{enumerate}
+  \frase{O bom instalador não é o mais rápido. É o que entrega uma instalação segura, correta e que continua funcionando muitos anos depois.}
+\end{frame}
+
+% ================= PARTE 2 =================
+\section{Estruturas de fixação}
+\abertura{2}{Estruturas de fixação}{O sistema fotovoltaico começa na estrutura.}
+
+\begin{frame}{Por que a estrutura é tão importante?}
+  \begin{columns}[c]
+    \begin{column}{0.52\textwidth}
+      A estrutura precisa garantir:
+      \begin{enumerate}
+        \item segurança dos módulos e das pessoas
+        \item resistência mecânica
+        \item estabilidade contra o vento
+        \item durabilidade
+        \item compatibilidade com os módulos
+      \end{enumerate}
+      \frase{O módulo não deve só ficar preso. Deve ficar seguro por décadas.}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \centering
+      {\small\bfseries O caminho das cargas}\\[0.3em]
+      \begin{tikzpicture}[node distance=0.2cm,
+          c/.style={pill,text width=4.4cm,minimum height=1.55em,fill=azulclaro,text=azul}]
+        \node[c,fill=solar] (a) {MÓDULO};
+        \node[c,below=of a] (b) {GRAMPO};
+        \node[c,below=of b] (c) {TRILHO};
+        \node[c,below=of c] (d) {GANCHO / FIXADOR};
+        \node[c,below=of d] (e) {TELHADO / ESTRUTURA};
+        \node[c,below=of e,fill=azul,text=white] (f) {EDIFICAÇÃO};
+        \foreach \x/\y in {a/b,b/c,c/d,d/e,e/f}{\draw[seta] (\x) -- (\y);}
+      \end{tikzpicture}\\[0.3em]
+      {\scriptsize\color{cinza} Toda força no módulo deve chegar com segurança à edificação.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Principais tipos de estruturas}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+      \small
+      \renewcommand{\arraystretch}{1.6}
+      \rowcolors{2}{fundo}{white}
+      \begin{tabular}{>{\bfseries}L{2.6cm} L{3.6cm}}
+        \cabecalho \tcab{Aplicação} & \tcab{Exemplo de uso}\\
+        Telha cerâmica & Residências\\
+        Telha metálica & Galpões\\
+        Fibrocimento & Galpões e residências\\
+        Laje & Edificações comerciais\\
+        Solo & Usinas e sistemas grandes\\
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{card}{verde}{\faCheckCircle\enspace Em todos os casos}
+        \begin{itemize}
+          \item fixar na estrutura do telhado, e não só na telha
+          \item usar o fixador certo para cada cobertura
+          \item vedar as perfurações
+          \item seguir o manual do fabricante
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Vento e distância entre ganchos}
+  \begin{columns}[c]
+    \begin{column}{0.33\textwidth}
+      \begin{card}{azul}{\faWind\enspace Regra prática}
+        O Brasil é dividido em \textbf{5 regiões de vento}.\\[0.3em]
+        Quanto \textbf{mais vento}, \textbf{menor} a distância entre os ganchos.
+      \end{card}
+    \end{column}
+    \begin{column}{0.62\textwidth}
+      \centering\small
+      \renewcommand{\arraystretch}{1.5}
+      \rowcolors{2}{fundo}{white}
+      \begin{tabular}{>{\bfseries}c c c c}
+        \cabecalho \tcab{Região} & \tcab{Vento (km/h)} & \tcab{Módulo 60 cél.} & \tcab{Módulo 72 cél.}\\
+        I   & até 108    & 2,00 m & 1,80 m\\
+        II  & 108 a 126  & 1,70 m & 1,60 m\\
+        III & 126 a 144  & 1,50 m & 1,40 m\\
+        IV  & 144 a 162  & 1,35 m & 1,25 m\\
+        V   & 162 a 180  & 1,20 m & 1,10 m\\
+      \end{tabular}\\[0.4em]
+      {\scriptsize\color{cinza} Exemplo de fabricante (perfil de alumínio de 45\,mm). Sempre seguir o manual do produto usado.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Distância entre trilhos}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.95,cota/.style={{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]},thin,cinza}]
+        \fill[azulclaro] (0,0) rectangle (2.6,4.4);
+        \draw[azul,line width=1.4pt] (0,0) rectangle (2.6,4.4);
+        \foreach \y in {0.55,1.1,...,3.9}{\draw[azul!25] (0,\y) -- (2.6,\y);}
+        \draw[azul!25] (1.3,0) -- (1.3,4.4);
+        \fill[solar] (-0.5,0.92) rectangle (3.1,1.08);
+        \fill[solar] (-0.5,3.32) rectangle (3.1,3.48);
+        \draw[cota] (3.5,0) -- (3.5,1.0) node[midway,right,font=\scriptsize,text=azul] {1/5 a 1/4 de L};
+        \draw[cota] (3.5,1.0) -- (3.5,3.4) node[midway,right,font=\scriptsize,text=azul] {1/2 a 3/5 de L};
+        \draw[cota] (3.5,3.4) -- (3.5,4.4) node[midway,right,font=\scriptsize,text=azul] {1/5 a 1/4 de L};
+        \draw[cota] (-0.9,0) -- (-0.9,4.4) node[midway,left,font=\small\bfseries,text=azul] {L};
+        \node[font=\scriptsize\bfseries,text=laranja,anchor=east] at (-0.55,3.4) {trilho};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $L$ é o comprimento do módulo.
+        \item Cada trilho fica a cerca de \textbf{1/5 a 1/4 de $L$} da borda.
+        \item Entre os dois trilhos ficam \textbf{1/2 a 3/5 de $L$}.
+      \end{itemize}
+      \frase{O módulo fica apoiado nos pontos indicados pelo fabricante, sem esforço excessivo.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Estrutura para solo}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \small
+      \renewcommand{\arraystretch}{1.5}
+      \rowcolors{2}{fundo}{white}
+      \begin{tabular}{L{3.2cm} L{3.4cm}}
+        \cabecalho \tcab{Estrutura fixa} & \tcab{Rastreador (tracker)}\\
+        Mais simples & Mais complexo\\
+        Menor custo & Maior custo\\
+        Menor manutenção & Maior manutenção\\
+        Inclinação fixa & Inclinação variável\\
+        Mais comum & Projetos específicos\\
+        \textcolor{cinza}{--} & Maior produção potencial\\
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{card}{azul}{\faMountain\enspace Pontos de atenção}
+        \begin{itemize}
+          \item tipo do solo e fundação
+          \item ação do vento
+          \item corrosão e drenagem
+          \item nivelamento e alinhamento
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{No solo, a estrutura não termina no módulo: ela começa na fundação.}
+\end{frame}
+
+\begin{frame}{Aterramento da estrutura e erros comuns}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=at]{azul}{\faLink\enspace Aterramento de painéis e estruturas}
+        \begin{itemize}
+          \item molduras e trilhos \textbf{equipotencializados}
+          \item cabo de aterramento entre módulos e trilho
+          \item grampos com dentes que furam o anodizado e fazem contato elétrico
+          \item estrutura ligada ao aterramento do sistema
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=at]{vermelho}{\faTimesCircle\enspace Erros de instalação}
+        \begin{itemize}
+          \item fixar só na telha
+          \item parafuso inadequado
+          \item não vedar furos
+          \item trilhos desalinhados
+          \item apertar demais
+          \item improvisar peças
+          \item ignorar o manual
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Um bom módulo e um bom inversor não compensam uma estrutura mal instalada.}
+\end{frame}
+
+% ================= PARTE 3 =================
+\section{Instalação dos módulos}
+\abertura{3}{Instalação dos módulos}{Recebimento, manuseio, fixação, conexões e organização dos cabos.}
+
+\begin{frame}{Recebimento e manuseio dos módulos}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=rm]{azul}{\faBoxOpen\enspace Ao receber}
+        \begin{itemize}
+          \item modelo, potência e quantidade
+          \item número de série
+          \item embalagem
+          \item vidro, moldura e caixa de junção
+          \item cabos e conectores
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=rm]{azul}{\faDolly\enspace No transporte}
+        \begin{itemize}
+          \item evitar impactos e torções
+          \item não arrastar
+          \item não apoiar objetos em cima
+          \item considerar peso e tamanho
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=rm]{azul}{\faArrowUp\enspace Na subida ao telhado}
+        \begin{itemize}
+          \item transporte em dupla
+          \item içamento ou guincho
+          \item cuidado com o vento
+          \item comunicação na equipe
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Um módulo moderno pode ter mais de 3\,m² e funcionar como uma ``vela'' no vento.}
+\end{frame}
+
+\begin{frame}{Antes do primeiro módulo e sequência de instalação}
+  \begin{columns}[c]
+    \begin{column}{0.44\textwidth}
+      \begin{card}{verde}{\faTasks\enspace Checklist antes de começar}
+        \begin{itemize}
+          \item estrutura concluída e trilhos alinhados
+          \item layout e orientação conferidos
+          \item sequência de instalação definida
+          \item espaçamentos do projeto
+          \item cabos e conectores acessíveis
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      {\small\bfseries Sequência prática}\\[0.4em]
+      \begin{tikzpicture}[node distance=0.1cm,
+          c/.style={pill,text width=5.6cm,minimum height=1.45em,fill=azulclaro,text=azul,align=left,font=\scriptsize}]
+        \node[c] (1) {\textbf{1.} Posicionar o módulo};
+        \node[c,below=of 1] (2) {\textbf{2.} Ajustar o alinhamento};
+        \node[c,below=of 2] (3) {\textbf{3.} Fixar};
+        \node[c,below=of 3] (4) {\textbf{4.} Aplicar o torque especificado};
+        \node[c,below=of 4] (5) {\textbf{5.} Fazer as conexões};
+        \node[c,below=of 5] (6) {\textbf{6.} Organizar os cabos};
+        \node[c,below=of 6,fill=solar] (7) {\textbf{7.} Conferir a instalação};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Danos visíveis e invisíveis}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=dn]{vermelho}{\faBan\enspace O que evitar}
+        \begin{itemize}
+          \item pisar no módulo
+          \item apoiar peso no vidro
+          \item arrastar na estrutura
+          \item forçar cabos e conectores
+          \item usar como apoio de ferramentas
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=dn]{azul}{\faEye\enspace Visíveis e invisíveis}
+        \textbf{Visíveis:} vidro quebrado, moldura deformada, caixa de junção danificada.\\[0.4em]
+        \textbf{Invisíveis:} microfissuras, danos às células, falhas internas.
+      \end{card}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{card}[equal height group=dn]{laranja}{\faSearchPlus\enspace Causas de microfissuras}
+        \begin{itemize}
+          \item impactos e quedas
+          \item torção
+          \item pressão localizada
+          \item pisoteamento
+          \item manuseio inadequado
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Nem todo dano feito na instalação pode ser visto a olho nu.}
+\end{frame}
+
+\begin{frame}{Conexões entre módulos e crimpagem MC4}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{card}[equal height group=mc]{azul}{\faPlug\enspace Pontos de atenção}
+        \begin{itemize}
+          \item conferir a polaridade
+          \item seguir a sequência da string
+          \item conectores MC4 compatíveis
+          \item encaixe completo
+          \item \textbf{``pulo do sapo''}: ligação alternada que reduz o cabo de retorno da string
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{card}[equal height group=mc]{azul}{\faTools\enspace Crimpagem do conector MC4}
+        \begin{enumerate}
+          \item cortar o cabo
+          \item decapar no comprimento correto
+          \item inserir o condutor no terminal
+          \item crimpar com o alicate específico
+          \item inserir o terminal no conector
+          \item conferir o travamento
+          \item inspecionar a montagem
+        \end{enumerate}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Organização dos cabos}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=oc]{vermelho}{\faTimes\enspace Errado}
+        \begin{itemize}
+          \item cabos pendurados
+          \item cabos encostando no telhado
+          \item cabos sujeitos à abrasão
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=oc]{verde}{\faCheck\enspace Correto}
+        \begin{itemize}
+          \item cabos bem fixados
+          \item string organizada
+          \item conectores protegidos
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  {\small\bfseries\color{laranja} Conclusões da parte}
+  \begin{itemize}\small
+    \item O módulo deve chegar intacto à estrutura e ser posicionado conforme o projeto.
+    \item Evitar impactos e esforços mecânicos durante a instalação.
+    \item Uma inspeção final evita problemas futuros.
+  \end{itemize}
+\end{frame}
+
+% ================= PARTE 4 =================
+\section{Instalação elétrica}
+\abertura{4}{Instalação elétrica}{Cabos, proteções CC e CA, qualidade das conexões e aterramento.}
+
+\begin{frame}{Visão geral da instalação elétrica}
+  \begin{center}
+  \begin{tikzpicture}[c/.style={pill,text width=1.75cm,minimum height=2.7em}]
+    \node[font=\scriptsize\bfseries,text=laranja,anchor=east,align=right] at (-1.15,0) {\faSolarPanel\\LADO CC};
+    \foreach \t [count=\i] in {Módulos FV,Cabos CC,String / arranjo,Proteção CC}{
+      \node[c,fill=solar,text=azul] (a\i) at (\i*2.45-2.45,0) {\t};}
+    \node[c,fill=azul,text=white] (a5) at (4*2.45,0) {Inversor};
+    \foreach \i [evaluate=\i as \j using int(\i+1)] in {1,...,4}{\draw[seta] (a\i) -- (a\j);}
+    \node[font=\scriptsize\bfseries,text=cinza,anchor=east,align=right] at (-1.15,-1.8) {\faPlug\\LADO CA};
+    \foreach \t [count=\i] in {Proteção CA,Quadro elétrico,Medidor,Rede da distribuidora}{
+      \node[c,fill=cinzaclaro,text=azul] (b\i) at (\i*2.45-2.45,-1.8) {\t};}
+    \draw[seta,rounded corners=4pt] (a5.south) -- ++(0,-0.4) -| (b1.north);
+    \foreach \i [evaluate=\i as \j using int(\i+1)] in {1,...,3}{\draw[seta] (b\i) -- (b\j);}
+  \end{tikzpicture}
+  \end{center}
+  \vspace{0.3em}
+  \begin{card}{azul}{\faFile*[regular]\enspace Do projeto para a obra: o que interpretar}
+    Diagrama unifilar, quantidade de strings, identificação dos circuitos, cabos e proteções especificados, aterramento e caminho dos cabos.
+  \end{card}
+\end{frame}
+
+\begin{frame}{Cabos de corrente contínua (CC)}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=cb]{laranja}{\faThermometerHalf\enspace Cabo comum \emph{versus} cabo FV}
+        \renewcommand{\arraystretch}{1.3}
+        \begin{tabular}{@{}L{0.43\linewidth} L{0.5\linewidth}@{}}
+          \textcolor{vermelho}{\faTimes\ \textbf{Cabo comum}} & \textcolor{verde}{\faCheck\ \textbf{Cabo para FV}}\\
+          pouca resistência UV & resistente a UV\\
+          isolação inadequada & dupla isolação\\
+          envelhece rápido & feito para área externa\\
+        \end{tabular}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=cb]{verde}{\faCheckCircle\enspace Boas conexões}
+        \begin{multicols}{2}
+        \begin{itemize}
+          \item conectores compatíveis
+          \item crimpagem correta
+          \item encaixe sem folgas
+          \item proteção contra água
+          \item fora do contato com o telhado
+          \item polaridade conferida
+        \end{itemize}
+        \end{multicols}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \vspace{0.6em}
+  \begin{center}
+  \begin{tikzpicture}[c/.style={pill,fill=vermelho!10,text=vermelho!80!black,text width=1.9cm}]
+    \foreach \t [count=\i] in {Conector mal crimpado,Resistência de contato,Aquecimento,Arco elétrico}{
+      \node[c] (e\i) at (\i*2.75,0) {\t};}
+    \node[c,fill=vermelho,text=white] (e5) at (5*2.75,0) {\faFire\ Risco de incêndio};
+    \foreach \i [evaluate=\i as \j using int(\i+1)] in {1,...,4}{\draw[seta,vermelho!60] (e\i) -- (e\j);}
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Proteções CC e CA}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=pr]{solar}{\faSolarPanel\enspace Lado CC}
+        \begin{itemize}
+          \item seccionamento CC
+          \item fusíveis ou disjuntor CC, quando aplicáveis
+          \item DPS CC
+          \item RSD (desligamento rápido)
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=pr]{azul}{\faPlug\enspace Lado CA}
+        \begin{itemize}
+          \item \textbf{DPS CA}: protege contra surtos de tensão
+          \item \textbf{Disjuntor}: protege contra sobrecarga e curto-circuito
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Todo sistema precisa de string box separada? Não. Muitos inversores já têm chave CC e DPS internos. Quem define é o projeto.}
+\end{frame}
+
+\begin{frame}{Separar circuitos CC e CA}
+  \begin{columns}[c]
+    \begin{column}{0.42\textwidth}
+      Evitar o \alert{mesmo eletroduto} para:\\[0.6em]
+      \icone{solar}{\faSolarPanel}\enspace \textbf{CC}: módulos $\rightarrow$ inversor\\[0.6em]
+      \icone{azul}{\faPlug}\enspace \textbf{CA}: inversor $\rightarrow$ quadro e rede
+    \end{column}
+    \begin{column}{0.54\textwidth}
+      \begin{card}{azul}{\faQuestionCircle\enspace Por quê?}
+        \begin{itemize}
+          \item facilita identificação e manutenção
+          \item reduz o risco de erro de conexão
+          \item não mistura circuitos de características diferentes
+          \item facilita o seccionamento nas intervenções
+          \item mantém a instalação organizada e conforme o projeto
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Qualidade nas conexões elétricas}
+  \begin{center}\small
+  \renewcommand{\arraystretch}{1.5}
+  \rowcolors{2}{fundo}{white}
+  \begin{tabular}{>{\bfseries}L{5.2cm} L{7.2cm}}
+    \cabecalho \tcab{Recurso} & \tcab{Função principal}\\
+    Terminal tubular (ilhós) e olhal & Melhorar a conexão de cabos flexíveis\\
+    Barramento (fase, neutro, terra) & Distribuir e conectar condutores\\
+    Conector de compressão & União mecânica e elétrica robusta\\
+    Terminal bimetálico & Transição entre cobre e alumínio\\
+    Arruela dentada & Auxiliar o contato e a equipotencialização\\
+    Composto antioxidante & Proteção em aplicações específicas\\
+    Torquímetro & Garantir o torque especificado\\
+  \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Bem executada \emph{versus} erros comuns}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=be]{verde}{\faCheckCircle\enspace Instalação bem executada}
+        \begin{itemize}
+          \item cabos organizados, curvas adequadas
+          \item conectores protegidos
+          \item circuitos separados e identificados
+          \item eletrodutos bem instalados
+          \item cabos longe de superfícies abrasivas
+          \item sem emendas desnecessárias
+          \item quadro organizado
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=be]{vermelho}{\faTimesCircle\enspace Erros mais comuns}
+        \begin{itemize}
+          \item cabo CC inadequado
+          \item conector mal crimpado ou incompatível
+          \item cabo exposto ao sol, ou apoiado no telhado
+          \item DPS ausente ou mal instalado
+          \item aterramento inadequado
+          \item disjuntor ou cabo CA mal dimensionado
+          \item quadro sem identificação
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Checklist elétrico final (antes de energizar)}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=ck]{solar}{\faSolarPanel\enspace Lado CC}
+        \begin{itemize}
+          \item polaridade conferida
+          \item tensão das strings conferida
+          \item conectores inspecionados
+          \item cabos íntegros
+          \item seccionamento adequado
+          \item DPS instalado corretamente
+          \item aterramento e equipotencialização
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=ck]{azul}{\faPlug\enspace Lado CA}
+        \begin{itemize}
+          \item tensão conferida
+          \item sequência de fases, quando aplicável
+          \item disjuntor adequado
+          \item cabos e DPS CA conferidos
+          \item PE (terra) conectado
+          \item conexões apertadas
+          \item circuitos identificados
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Medição do aterramento com terrômetro}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{card}[equal height group=tr]{azul}{\faRulerHorizontal\enspace Resistência de aterramento}
+        {\footnotesize\color{cinza} Método da queda de potencial (NBR 15749)}
+        \begin{itemize}
+          \item $X$ = maior dimensão do aterramento
+          \item haste de corrente (H) a $3X$
+          \item haste de tensão (S) a $Y = 0{,}62 \cdot 3X$
+          \item repetir com $Y$ deslocado $\pm 5\,\%$
+          \item diferença menor que 10\,\% indica leitura válida
+          \item antes, medir a tensão espúria
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{card}[equal height group=tr]{azul}{\faGlobeAmericas\enspace Resistividade do solo}
+        {\footnotesize\color{cinza} Método de Wenner (NBR 7117-1)}
+        \begin{itemize}
+          \item 4 hastes em linha, com espaçamento $D$ igual
+          \item $D$ = 1, 2, 4, 8, 16, 32 e 64\,m
+        \end{itemize}
+        \begin{center}
+          \tcbox[colback=white,colframe=solar,boxrule=1pt,arc=3pt,left=8pt,right=8pt]{\large$\rho = 2\pi R D$}
+        \end{center}
+        {\scriptsize $\rho$: resistividade ($\Omega\cdot$m) \quad $R$: leitura ($\Omega$) \quad $D$: distância (m)}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ================= PARTE 5 =================
+\section{Inversor e comissionamento}
+\abertura{5}{Inversor e comissionamento}{Instalar, conectar, testar e entregar o sistema.}
+
+\begin{frame}{Antes de instalar e onde instalar o inversor}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=iv]{azul}{\faClipboardList\enspace Conferir antes}
+        \begin{itemize}
+          \item modelo, potência e configuração do projeto
+          \item quantidade de MPPTs
+          \item faixa de tensão CC e corrente por MPPT
+          \item tensão da rede e número de fases
+          \item materiais, conectores e manual
+          \item local previsto no projeto
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=iv]{verde}{\faMapMarker*\enspace Local adequado}
+        \begin{itemize}
+          \item protegido de chuva e intempéries
+          \item ventilação e dissipação de calor
+          \item espaço livre ao redor
+          \item acesso fácil para manutenção
+          \item perto das conexões, sem obstáculos
+          \item suporte mecanicamente adequado
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Um inversor em local quente e sem ventilação pode funcionar hoje e falhar amanhã.}
+\end{frame}
+
+\begin{frame}{Fixação e conexões do inversor}
+  \fluxo{1.75cm}{Marcação,Furação,Fixar o suporte,Nivelamento,Instalação}
+  \vspace{-0.6em}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \begin{card}[equal height group=fx]{azul}{\faExclamationCircle\enspace Atenção na fixação}
+        \begin{itemize}
+          \item parede compatível com o peso
+          \item parafusos e buchas adequados
+          \item não obstruir entradas e saídas de ar
+          \item respeitar os afastamentos do fabricante
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \begin{card}[equal height group=fx]{solar}{\faExchange*\enspace Entradas e saídas}
+        \begin{minipage}[t]{0.47\linewidth}
+          \textbf{Entradas}
+          \begin{itemize}
+            \item strings CC
+            \item PE (terra)
+            \item comunicação
+            \item bateria*
+          \end{itemize}
+        \end{minipage}\hfill
+        \begin{minipage}[t]{0.5\linewidth}
+          \textbf{Saídas}
+          \begin{itemize}
+            \item CA
+            \item PE (terra)
+            \item monitoramento
+            \item cargas de emergência*
+          \end{itemize}
+        \end{minipage}\par
+        {\scriptsize\color{cinza} * Em inversores híbridos ou off-grid.}
+      \end{card}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Comissionamento}
+  \alert{Comissionamento} é a verificação e validação da instalação \textbf{antes da entrega}.
+  \vspace{0.5em}
+  \begin{columns}[T]
+    \begin{column}{0.235\textwidth}
+      \begin{card}[equal height group=cm]{vermelho}{\faShield*\enspace Segurança}
+        conexões, polaridade, aterramento e proteções
+      \end{card}
+    \end{column}
+    \begin{column}{0.235\textwidth}
+      \begin{card}[equal height group=cm]{laranja}{\faCubes\enspace Integridade}
+        cabos, conectores, fixações e identificação
+      \end{card}
+    \end{column}
+    \begin{column}{0.235\textwidth}
+      \begin{card}[equal height group=cm]{verde}{\faCogs\enspace Funciona\-mento}
+        inicialização, parâmetros, geração e comunicação
+      \end{card}
+    \end{column}
+    \begin{column}{0.235\textwidth}
+      \begin{card}[equal height group=cm]{azul}{\faClipboardCheck\enspace Conformidade}
+        projeto, fabricante e requisitos da instalação
+      \end{card}
+    \end{column}
+  \end{columns}
+  \vspace{0.4em}
+  \begin{center}
+  \begin{tikzpicture}[c/.style={pill,text width=3cm}]
+    \node[c,fill=cinzaclaro,text=azul] (a) at (0,0) {Instalação concluída};
+    \node[c,fill=solar,text=azul] (b) at (4,0) {Comissionamento};
+    \node[c,fill=azul,text=white] (c) at (8,0) {Entrega};
+    \draw[seta] (a) -- (b); \draw[seta] (b) -- (c);
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Checklist do comissionamento}
+  \newcommand{\ok}{\textcolor{verde}{\faSquare[regular]}}
+  \begin{columns}[T]
+    \begin{column}{0.47\textwidth}
+      \small
+      \renewcommand{\arraystretch}{1.5}
+      \rowcolors{2}{fundo}{white}
+      \begin{tabular}{L{5cm} c}
+        \cabecalho \tcab{Verificação} & \tcab{OK?}\\
+        Inversor bem fixado & \ok\\
+        Conexões CC conferidas & \ok\\
+        Polaridade CC conferida & \ok\\
+        Conexões CA conferidas & \ok\\
+        Torque das conexões & \ok\\
+        Cabos sem danos & \ok\\
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \small
+      \renewcommand{\arraystretch}{1.5}
+      \rowcolors{2}{fundo}{white}
+      \begin{tabular}{L{5cm} c}
+        \cabecalho \tcab{Verificação} & \tcab{OK?}\\
+        Conectores bem encaixados & \ok\\
+        Proteções instaladas & \ok\\
+        Aterramento conferido & \ok\\
+        Circuitos identificados & \ok\\
+        Parâmetros conforme projeto & \ok\\
+        Área liberada para energizar & \ok\\
+      \end{tabular}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Energização e verificação após ligar}
+  \fluxo{1.6cm}{Inspeção final,Energizar,Inicializar,Configurar,Conectar à rede,Verificar}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=en]{azul}{\faMicrochip\enspace No inversor}
+        \begin{itemize}
+          \item tensão e corrente CC
+          \item potência instantânea
+          \item tensão, corrente e frequência CA
+          \item energia gerada, status e códigos de erro
+        \end{itemize}
+      \end{card}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{card}[equal height group=en]{azul}{\faDesktop\enspace No monitoramento}
+        \begin{itemize}
+          \item inversor on-line e comunicando
+          \item strings e MPPTs como esperado
+          \item geração compatível com o momento
+          \item sem alarmes
+        \end{itemize}
+      \end{card}
+    \end{column}
+  \end{columns}
+  \frase{Se o inversor liga, mas um MPPT está sem geração, o comissionamento não está correto.}
+\end{frame}
+
+\begin{frame}{Erros na instalação do inversor}
+  \begin{card}{vermelho}{\faTimesCircle\enspace Erros comuns}
+    \begin{multicols}{2}
+    \begin{itemize}
+      \item sem ventilação adequada
+      \item conectores CC mal encaixados
+      \item polaridade invertida
+      \item torque inadequado
+      \item cabos tensionados nos conectores
+      \item cabos sem identificação
+      \item aterramento não conferido
+      \item configuração incorreta
+      \item monitoramento não configurado
+      \item entrega sem checklist
+    \end{itemize}
+    \end{multicols}
+  \end{card}
+  \frase{O sistema não está pronto quando o inversor liga. Está pronto quando foi instalado, inspecionado, testado, configurado e documentado.}
+\end{frame}
+
+\begin{frame}{Resumo geral: do inversor à entrega}
+  \begin{center}
+  \begin{tikzpicture}[c/.style={pill,fill=fundo,text=azul,font=\small,text width=5.4cm,align=left,
+      minimum height=2.2em,inner sep=5pt}]
+    \foreach \t [count=\i] in {Conferir projeto e manual,Instalar e fixar o inversor,Conferir o aterramento,
+        Executar as conexões CC,Executar as conexões CA,Conferir as proteções}{
+      \node[c] at (0,-\i*0.92) {\textcolor{laranja}{\bfseries\i.}\enspace\t};}
+    \foreach \t [count=\i,evaluate=\i as \k using int(\i+6)] in {Inspeção completa,Energização,Configuração,
+        Testes e monitoramento,Registro e entrega}{
+      \node[c] at (6.6,-\i*0.92) {\textcolor{laranja}{\bfseries\k.}\enspace\t};}
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+% ================= ENCERRAMENTO =================
+\section{Conclusão}
+\begin{frame}{Conclusão}
+  \barraetapas{9}
+  \vspace{0.2em}
+  \begin{itemize}
+    \item A instalação começa no \textbf{projeto} e no \textbf{planejamento}, com foco em segurança.
+    \item A \textbf{estrutura} leva as cargas do módulo até a edificação.
+    \item Os \textbf{módulos} exigem cuidado para evitar danos visíveis e invisíveis.
+    \item A \textbf{instalação elétrica} depende de cabos certos, boas conexões e proteções.
+    \item O \textbf{comissionamento} valida tudo antes da entrega.
+  \end{itemize}
+  \frase{Um sistema bem instalado é seguro, gera o esperado e funciona por décadas.}
+\end{frame}
+
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[azul] (current page.south west) rectangle (current page.north east);
+    \begin{scope}[shift={($(current page.center)+(0,1.5)$)}]
+      \fill[solar] (0,0) circle (0.45);
+      \foreach \a in {0,45,...,315}{\draw[solar,line width=2pt,line cap=round] (\a:0.62) -- (\a:0.85);}
+    \end{scope}
+    \node[text=white,font=\fontsize{34}{38}\selectfont\bfseries] at ($(current page.center)+(0,-0.1)$) {Obrigado!};
+    \node[text=white!75!azul,font=\normalsize] at ($(current page.center)+(0,-1.0)$) {Wenes Gomes Aquino};
+    \node[text=solar,font=\small] at ($(current page.center)+(0,-1.5)$) {Instalação de Sistemas Fotovoltaicos};
+  \end{tikzpicture}
+\end{frame}
+
+\end{document}
